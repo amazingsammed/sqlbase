@@ -8,9 +8,9 @@ https://github.com/amazingsammed/sqlbase
 
 # Usage
 
-* There a php file in the asset folder of this project, put it in your *http* directory or *www folder* of *wampserver*
-* Make sure the php *apikey*  match the one you are initializing
-* ```dart
+* There a php file in the asset folder of this project, put it in your **http** directory or ***www folder*** of ***wampserver***
+* Make sure the php ***apikey***  match the one you are initializing
+```dart
 Sqlbase.initialize(url: "url_to_file.php", key: '123456')
 ```
 
