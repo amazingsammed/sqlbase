@@ -37,10 +37,7 @@ class Home extends StatelessWidget {
                     'subject':"Ghana 1",
                     "id":24
                   });
-              print(items.message);
-              print(items.error);
-              print(items.statusCode);
-              print(items.message);
+
               },
             child: Text('Try')),
       ),

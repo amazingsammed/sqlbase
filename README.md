@@ -1,15 +1,32 @@
-# sqlbase
+# SQLbase
 
 Dart to php to Sql database
 
-## Getting Started
+# More contribution needed
+This is the repo
+https://github.com/amazingsammed/sqlbase
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/to/develop-plugins),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+# Usage
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+* There a php file in the asset folder of this project, put it in your *http* directory or *www folder* of *wampserver*
+* Make sure the php *apikey*  match the one you are initializing
+* ```dart
+Sqlbase.initialize(url: "url_to_file.php", key: '123456')
+```
+
+# In Dart
+To use the plugin, run
+```dart
+//use this to initialize the plugin
+Sqlbase.initialize(url: "http://localhost/sqlbase.php", key: '123456');
+```
+# Queries
+This looks similar to firebase queries
+```dart
+// To  get all data from a table
+await myDB.table("tablename").get();
+```
+
+
+
 
