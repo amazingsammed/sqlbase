@@ -1,6 +1,6 @@
 name: sqlbase
 description: "Dart to php to Sql database"
-version: 0.0.1
+version: 0.0.2
 homepage:
 
 environment:
