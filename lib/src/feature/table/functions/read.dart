@@ -26,9 +26,9 @@ extension SqlTableRead on SqlTable {
     try {
       final response = await http.post(
         Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
+        // headers: {
+        //   'Content-Type': 'application/x-www-form-urlencoded',
+        // },
         body: {
           'key': key,
           'action': 'TABLE-GET',
@@ -36,7 +36,7 @@ extension SqlTableRead on SqlTable {
           'conditions': jsonEncode(_filterList.isEmpty ? null : _filterList),
         },
       );
-
+      _filterList.clear();
       return phpResponse(response);
     } catch (e, stackTrace) {
       // Optional: Print or log the error and stackTrace

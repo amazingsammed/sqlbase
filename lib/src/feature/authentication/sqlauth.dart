@@ -35,7 +35,7 @@ class SqlAuth{
       password = password.trim();
       email = email.trim();
       Map<String, dynamic> userMap = {};
-      userMap.addAll({'action': 'SIGN-UP','table':tablename, 'email': email, 'password': password,'data':data ,'key':key});
+      userMap.addAll({'action': 'SIGN-UP','table':tablename, 'email': email, 'password': password,'data':jsonEncode(data) ,'key':key});
       final response = await http.post(
         Uri.parse(url),
         body: userMap,
@@ -43,7 +43,7 @@ class SqlAuth{
       return phpResponse(response);
     } catch (e) {
       Exception(e);
-      return SqlBaseResponse(statusCode: 0, error: "Something went wrong");
+      return SqlBaseResponse(statusCode: 0, error: e.toString());
     }
   }
 
