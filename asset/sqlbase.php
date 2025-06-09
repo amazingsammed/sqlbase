@@ -3,7 +3,7 @@ header('Content-Type: application/json');
 
 // Configuration
 $host = 'localhost';
-$dbname = 'waec';
+$dbname = 'store_app';
 $username = 'root';
 $password = '';
 $apiKey = '123456';
@@ -11,16 +11,7 @@ $apiKey = '123456';
 if (!isset($_POST['key']) || $_POST['key'] !== $apiKey) {
     die(json_encode(['error' => 'Invalid API key']));
 }
-function generateUUIDv4() {
-    return sprintf(
-        '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-        mt_rand(0, 0xffff), mt_rand(0, 0xffff),                 // 32 bits
-        mt_rand(0, 0xffff),                                     // 16 bits
-        mt_rand(0, 0x0fff) | 0x4000,                             // 16 bits, version 4
-        mt_rand(0, 0x3fff) | 0x8000,                             // 16 bits, variant
-        mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)  // 48 bits
-    );
-}
+
 
 
 try {
@@ -47,8 +38,8 @@ try {
         case "SIGN-UP":
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
-            $data = json_decode($_POST['data'],true) ?? [];
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !$password ) {
+            $data = json_decode($_POST['data'], true) ?? [];
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !$password) {
                 http_response_code(400);
                 echo json_encode(['error' => $email]);
                 echo json_encode(['error' => $password]);
@@ -138,7 +129,6 @@ try {
                     }
 
                     if ($type === 'where') {
-                        // Sanitize allowed operators
                         $allowedOperators = ['=', '!=', '<', '<=', '>', '>=', 'LIKE'];
                         if (!in_array($operator, $allowedOperators)) {
                             $operator = '=';
@@ -182,7 +172,7 @@ try {
                 echo json_encode(['error' => true, 'message' => $e->getMessage()]);
             }
             break;
-        case 'TABLE-ADD2':
+
         case 'TABLE-ADD':
             $columns = implode(', ', array_keys($data));
             $placeholders = ':' . implode(', :', array_keys($data));
@@ -218,22 +208,7 @@ try {
 
             echo json_encode(['success' => true, 'ids' => $insertedIds]);
             break;
-        // $columns = implode(', ', array_keys($data));
-        // $placeholders = ':' . implode(', :', array_keys($data));
-        // $sql = "INSERT INTO $table ($columns) VALUES ($placeholders)";
-        // $stmt = $pdo->prepare($sql);
-        // foreach ($data as $key => $value) {
-        //     $stmt->bindValue(":$key", $value);
-        // }
-        // $stmt->execute();
-        // echo json_encode(['success' => true, 'id' => $pdo->lastInsertId()]);
-        // break;
-
-
         case 'RECORD-DELETE':
-            // Validate table name to avoid SQL injection
-
-
             $sql = "DELETE  FROM `$table`";
             $params = [];
             $whereClauses = [];
@@ -285,7 +260,6 @@ try {
             echo json_encode(['error' => true, 'message' => "No Logic"]);
 
             break;
-
         case 'RECORD-UPDATE':
             $data = json_decode($_POST['data'], true);
             $conditions = json_decode($_POST['conditions'], true);
@@ -327,13 +301,93 @@ try {
             $success = $stmt->execute();
             echo json_encode(['success' => $success, 'rowsAffected' => $stmt->rowCount()]);
             break;
+        case 'BATCH-INSERT':
+        $data = json_decode($_POST['data'],true);
+          if (!is_array($data) || empty($data)) {
+                echo json_encode(['message' => "$data", 'error' => 'Invalid data']);
+                break;
+            }
+            try {
+                $pdo->beginTransaction();
 
+                foreach ($data as $batch) {
+                    $table = $batch['table'];
+                    $type = $batch['type'];
+                    $data = $batch['data'];
+                    if ($type === 'single') {
+                      insertRow($pdo, $table, $data);
+                      break;
+                    } elseif ($type === 'many') {
+                        foreach ($data as $row) {
+                            insertRow($pdo, $table, $row);
+                        }
+                    } else {
+                        throw new Exception("Invalid type '$type' for table '$table'");
+                    }
+                }
+
+                $pdo->commit();
+                echo json_encode(['success' => true]);
+
+            } catch (Exception $e) {
+                $pdo->rollBack();
+                http_response_code(500);
+                echo json_encode(['error' => 'Transaction failed', 'message' => $e->getMessage()]);
+            }
+            break;
 
         default:
             echo json_encode(['error' => 'Invalid action']);
     }
 } catch (PDOException $e) {
     echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+}
+
+function insertRow(PDO $pdo, string $table, array $data): void
+{
+    $columns = array_keys($data);
+    $placeholders = array_map(fn($col) => ':' . $col, $columns);
+
+    $sql = sprintf(
+        "INSERT INTO %s (%s) VALUES (%s)",
+        $table,
+        implode(', ', $columns),
+        implode(', ', $placeholders)
+    );
+
+    $stmt = $pdo->prepare($sql);
+    foreach ($data as $key => $value) {
+        $stmt->bindValue(":$key", $value);
+    }
+    $stmt->execute();
+}
+
+function generateUUIDv4()
+{
+    return sprintf(
+        '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+        mt_rand(0, 0xffff), mt_rand(0, 0xffff),                 // 32 bits
+        mt_rand(0, 0xffff),                                     // 16 bits
+        mt_rand(0, 0x0fff) | 0x4000,                             // 16 bits, version 4
+        mt_rand(0, 0x3fff) | 0x8000,                             // 16 bits, variant
+        mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)  // 48 bits
+    );
+}
+
+
+function testinsertRow(PDO $pdo, string $table, array $data): void
+{
+    $columns = array_keys($data);
+    $placeholders = array_map(fn($col) => ':' . $col, $columns);
+
+    $sql = sprintf(
+        "INSERT INTO %s (%s) VALUES (%s)",
+        $table,
+        implode(', ', $columns),
+        implode(', ', $placeholders)
+    );
+   echo json_encode(['error' => 'Transaction failed', 'message' => $sql]);
+
 }
 
 ?>

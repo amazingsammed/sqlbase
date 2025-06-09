@@ -15,13 +15,13 @@ extension SqlTableCreate on SqlTable{
       );
       return phpResponse(response);
     } catch (e) {
-      Exception(e);
-      return SqlBaseResponse(statusCode: 0, error: "Something went wrong");
+      return SqlBaseResponse(statusCode: 0, error: e.toString());
     }
   }
 
   Future<SqlBaseResponse> addMany(
       List<Map<String, dynamic>> data) async {
+    try{
     final response = await http.post(
       Uri.parse(url),
       body: {
@@ -32,5 +32,8 @@ extension SqlTableCreate on SqlTable{
       },
     );
     return phpResponse(response);
+  } catch (e) {
+  return SqlBaseResponse(statusCode: 0, error: e.toString());
+  }
   }
 }

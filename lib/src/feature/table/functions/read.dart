@@ -38,14 +38,11 @@ extension SqlTableRead on SqlTable {
       );
       _filterList.clear();
       return phpResponse(response);
-    } catch (e, stackTrace) {
-      // Optional: Print or log the error and stackTrace
-      debugPrint('SqlTable.get() error: $e');
-      debugPrintStack(stackTrace: stackTrace);
+    } catch (e) {
 
       return SqlBaseResponse(
         statusCode: 0,
-        error: "Something went wrong while fetching data",
+        error: e.toString(),
       );
     }
   }

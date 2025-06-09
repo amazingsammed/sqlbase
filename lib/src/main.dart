@@ -1,10 +1,10 @@
-
-
 import 'package:sqlbase/src/feature/authentication/sqlauth.dart';
-import 'package:sqlbase/src/feature/rawquery/rawquery.dart';
 
+
+import '../sqlbase.dart';
 import 'feature/table/sqlrecord.dart';
 import 'feature/table/sqltable.dart';
+import 'feature/transaction/sqlbatch.dart';
 
 class Sqlbase {
   static String? _url;
@@ -15,20 +15,31 @@ class Sqlbase {
     _key = key;
   }
 
-   SqlTable table(String tableName) {
+  SqlTable table(String tableName, {List<String>? select, bool distinct = false}) {
     if (_url == null || _key == null) {
-      throw Exception('Sqlbase not initialized. Call Sqlbase.initialize first.');
+      throw Exception(
+          'Sqlbase not initialized. Call Sqlbase.initialize first.');
     }
-    return SqlTable(tableName, _url!, _key!);
+    return SqlTable(
+        tableName, _url!, _key!, select: select, distinct: distinct);
   }
-
 
 
   SqlAuth auth(String tableName) {
     if (_url == null || _key == null) {
-      throw Exception('Sqlbase not initialized. Call Sqlbase.initialize first.');
+      throw Exception(
+          'Sqlbase not initialized. Call Sqlbase.initialize first.');
     }
     return SqlAuth(tableName, _url!, _key!);
+  }
+
+
+  Future<SqlBaseResponse> transaction(
+      SqlBatch Function(SqlBatch action) result) async {
+    SqlBatch batch = SqlBatch(_url!, _key!);
+    SqlBatch data = result(batch);
+    SqlBaseResponse responds = await data.commit();
+    return responds;
   }
 
 
