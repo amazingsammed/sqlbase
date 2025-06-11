@@ -1,70 +1,175 @@
 # SQLbase
 
-Dart to php to Sql database
+**SQLbase** is a lightweight Flutter plugin that enables seamless communication between a Flutter app and an SQL database through a simple PHP backend. It’s designed to function similarly to Firebase queries, making it easy and intuitive to use.
 
-# More contribution needed
-This is the repo
-https://github.com/amazingsammed/sqlbase
+---
 
-# Usage
-1. [Download PHP script](blob:https://github.com/7085519d-acfb-4f87-a739-50ee317c4c12)
-2. Put it in your **http** directory or ***www folder*** of ***wampserver***
-3. Change the initial configuration of the php file
-```php 
+## 🚀 Features
+
+- Connects Flutter with MySQL using PHP
+- Easy query interface inspired by Firebase
+- Lightweight and easy to integrate
+- Supports CRUD operations (Create, Read, Update, Delete)
+- Supports advanced SQL features like filtering, ordering, and grouping
+
+---
+
+## 📦 Installation
+
+Add `sqlbase` to your `pubspec.yaml` file:
+
+```yaml
+dependencies:
+  sqlbase: 0.0.3^ # Replace with the latest version
+```
+
+Then run:
+
+```bash
+flutter pub get
+```
+
+---
+
+## ⚙️ Setup Guide
+
+### 1. Download the PHP Script
+**Link**  - https://github.com/amazingsammed/sqlbase/blob/master/asset/sqlbase.php
+
+👉 [Download the PHP Script](blob\:https://github.com/7085519d-acfb-4f87-a739-50ee317c4c12)
+
+### 2. Deploy the Script
+
+Place the downloaded PHP file in your server’s root directory:
+
+- For **WAMP**, place it in the `www/` folder
+- For other servers, use the respective public folder
+
+### 3. Configure the PHP Script
+
+Open the script and set your database configuration:
+
+```php
 $host = 'YourAddress';
-$dbname = 'YourDatatbaseName';
+$dbname = 'YourDatabaseName';
 $username = 'YourUsername';
 $password = 'YourPassword';
-/// this apikey must match with the one you provided
-/// in flutter intialization.
+
+// API key must match the one used in your Flutter app
 $apiKey = '123456';
 ```
-4. Initialize the plugin in your flutter app.
- ```dart
-Sqlbase.initialize(url: "TheFile.php", key: '123456')
-```
 
-# A Complete Guide
-This is the basic complete guide to use sqlbase plugin made by Sammed Technologies
+### 4. Initialize the Plugin in Flutter
 
 ```dart
-/// Initialize the plugin
 Sqlbase.initialize(url: "http://localhost/sqlbase.php", key: '123456');
-
-
-final mydb = Sqlbase();
-
-// To  read all data from a table
-await myDB.table("tablename").get();
-
-
-// To  insert  data into a table
-await myDB.table("tablename").add(
-{
-    "name" : 'Flutter',
-    "year" : 2015
-});
-
-// To  update  data in a table
-await myDB.table("tablename").record("1",column:"id").update(
-{
-    "name" : 'Nextjs',
-    "year" : 2019
-});
-
-
-// To  delete  data in a table
-await myDB.table("tablename").record("1",column:"id").delete();
-
 ```
 
-# Methods for table
-- .where("name", isEqualto: "Sammed")
-- .isEqualTo("name":"Sammed")
-- .limit(10)
-- .orderBy("id","ASC")
-- .groupBy("gender")
+---
 
+## 📘 Usage Guide
 
+### Initialize
 
+```dart
+Sqlbase.initialize(url: "http://localhost/sqlbase.php", key: '123456');
+final myDB = Sqlbase();
+```
+
+### 🔍 Read Data
+
+```dart
+await myDB.table("users").get();
+```
+
+### ➕ Insert Data
+
+```dart
+await myDB.table("users").add({
+  "name": "Flutter",
+  "year": 2015,
+});
+```
+
+### ✏️ Update Data
+
+```dart
+await myDB.table("users").record("1", column: "id").update({
+  "name": "Next.js",
+  "year": 2019,
+});
+```
+
+### ❌ Delete Data
+
+```dart
+await myDB.table("users").record("1", column: "id").delete();
+```
+
+---
+
+## 🧰 Table Methods
+
+- `.where("column", isEqualTo: "value")`
+- `.isEqualTo({"column": "value"})`
+- `.limit(10)`
+- `.orderBy("column", "ASC" or "DESC")`
+- `.groupBy("column")`
+- `.get()`
+- `.add(Map<String, dynamic> data)`
+- `.addMany(List<Map<String, dynamic>> dataList)`
+
+## 🧾 Record Methods
+
+- `.update(Map<String, dynamic> newData)`
+- `.delete()`
+
+---
+
+## 📌 Best Practices
+
+- Ensure the API key in your PHP file and Flutter app **match**
+- Use HTTPS in production for secure communication
+- Validate all user inputs to prevent SQL injection
+- Use environment variables or a secure config file for DB credentials
+
+---
+
+## 💡 Examples
+
+```dart
+// Read with condition
+await myDB.table("products").where("price", isEqualTo: 100).get();
+
+// Group and order
+await myDB.table("users").groupBy("gender").orderBy("id", "DESC").limit(5).get();
+```
+
+---
+
+## 🧪 Testing
+
+To test locally:
+
+1. Use a tool like **Postman** to verify the PHP script response
+2. Check database connection and permissions
+3. Enable PHP error display for debugging:
+   ```php
+   ini_set('display_errors', 1);
+   error_reporting(E_ALL);
+   ```
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Feel free to fork the repo and submit pull requests.
+
+🔗 GitHub: [https://github.com/amazingsammed/sqlbase](https://github.com/amazingsammed/sqlbase)
+
+---
+
+## 📄 License
+
+MIT License. See [LICENSE](LICENSE) for details.
 
