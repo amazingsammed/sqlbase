@@ -1,9 +1,8 @@
 import 'package:sqlbase/src/feature/authentication/sqlauth.dart';
+export  'package:sqlbase/src/models/selectModel.dart';
 
 
 import '../sqlbase.dart';
-import 'feature/table/sqlrecord.dart';
-import 'feature/table/sqltable.dart';
 import 'feature/transaction/sqlbatch.dart';
 
 class Sqlbase {
@@ -15,7 +14,7 @@ class Sqlbase {
     _key = key;
   }
 
-  SqlTable table(String tableName, {List<String>? select, bool distinct = false}) {
+  SqlTable table(String tableName, {List<Select>? select, bool distinct = false}) {
     if (_url == null || _key == null) {
       throw Exception(
           'Sqlbase not initialized. Call Sqlbase.initialize first.');

@@ -4,9 +4,9 @@
 part of 'package:sqlbase/src/feature/table/sqltable.dart';
 extension SqlTogetherWith on SqlTable{
 
-  SqlDualTable togetherWith(String table,{required  Compare basedOn}){
+  SqlDualTable togetherWith(String table,{ List<Select>? select}){
 
-    return SqlDualTable(SqlTable(tableName, url, key),table,basedOn);
+    return SqlDualTable(SqlTable(tableName, url, key,select: this.select),table,select);
   }
 }
 
@@ -19,9 +19,9 @@ class Compare{
 
   Map<String, dynamic> toMap() {
     return {
-      'firstTable': firstTableColumn,
-      'compare': compare,
-      'secondTable': secondTableColumn,
+      'table1': firstTableColumn,
+      'func': "=",
+      'table2': secondTableColumn,
     };
   }
 

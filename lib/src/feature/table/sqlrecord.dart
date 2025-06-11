@@ -1,7 +1,8 @@
+// ignore_for_file: invalid_use_of_visible_for_testing_member
+
 import 'dart:convert';
 
 import 'package:sqlbase/sqlbase.dart';
-import 'package:sqlbase/src/utility/sqlbaseresponse.dart';
 import 'package:http/http.dart' as http;
 import '../../utility/phpresponse.dart';
 
@@ -38,7 +39,7 @@ class SqlRecord {
           }]),
         },
       );
-      print(response.body);
+
       return phpResponse(response);
     } catch (e) {
       return SqlBaseResponse(statusCode: 0, error: e.toString());
@@ -58,7 +59,6 @@ class SqlRecord {
         },
       );
       return phpResponse(response);
-      return SqlBaseResponse(statusCode: 0);
     } catch (e) {
       return SqlBaseResponse(statusCode: 0, error: e.toString());
     }
@@ -106,7 +106,6 @@ class SqlRecord {
         },
       );
       return phpResponse(response);
-      return SqlBaseResponse(statusCode: 0);
     } catch (e) {
       return SqlBaseResponse(statusCode: 0, error: e.toString());
     }

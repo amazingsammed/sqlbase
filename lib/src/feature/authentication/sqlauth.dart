@@ -22,7 +22,6 @@ class SqlAuth{
         Uri.parse(url),
         body: userMap,
       );
-      print(response.body);
       return phpResponse(response);
     } catch (e) {
       Exception(e);

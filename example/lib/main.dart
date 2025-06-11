@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:sqlbase/sqlbase.dart';
 
 void main() {
@@ -32,13 +30,11 @@ class Home extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
             onPressed: () async {
-              var items = await myDB.table('subjects').record(23,column: 'id').update(
-                  {
-                    'subject':"Ghana 1",
-                    "id":24
-                  });
-
-              },
+              var items = await myDB
+                  .table('customer')
+                  .togetherWith('chart_of_account')
+                  .get(basedOn: Compare('coa_uuid', SqlCompare.equalTo, "uuid"));
+            },
             child: Text('Try')),
       ),
     );

@@ -1,7 +1,6 @@
 <?php
 header('Content-Type: application/json');
 
-// Configuration
 $host = 'localhost';
 $dbname = 'store_app';
 $username = 'root';
@@ -11,7 +10,6 @@ $apiKey = '123456';
 if (!isset($_POST['key']) || $_POST['key'] !== $apiKey) {
     die(json_encode(['error' => 'Invalid API key']));
 }
-
 
 
 try {
@@ -24,6 +22,13 @@ try {
     $table = $_POST['table'] ?? '';
     $data = isset($_POST['data']) ? json_decode($_POST['data'], true) : [];
     $conditions = isset($_POST['conditions']) ? json_decode($_POST['conditions'], true) : [];
+    $select = isset($_POST['select']) ? json_decode($_POST['select'], true) : [];
+
+    $table1 = $_POST['table'] ?? '';
+    $table2 = $_POST['table2'] ?? '';
+    $table1select = isset($_POST['table1-select']) ? json_decode($_POST['table1-select'], true) : [];
+    $table2select = isset($_POST['table2-select']) ? json_decode($_POST['table2-select'], true) : [];
+    $basedOn = isset($_POST['based-on']) ? json_decode($_POST['based-on'], true) : [];
     $uuid = generateUUIDv4();
 
     // Validate inputs
@@ -108,7 +113,26 @@ try {
                 break;
             }
 
-            $sql = "SELECT * FROM `$table`";
+
+            $columns = [];
+            foreach ($select as $field) {
+                if (!isset($field['name'])) continue;
+
+                $colName = preg_replace('/[^a-zA-Z0-9_]/', '', $field['name']);
+                $alias = isset($field['as']) ? preg_replace('/[^a-zA-Z0-9_]/', '', $field['as']) : $colName;
+
+                $columns[] = "`$colName` AS `$alias`";
+            }
+
+
+            if (empty($columns)) {
+                $selectClause = '*';
+            } else {
+                $selectClause = implode(", ", $columns);
+            }
+
+
+            $sql = "SELECT $selectClause FROM `$table`";
             $params = [];
             $whereClauses = [];
             $orderBy = '';
@@ -160,8 +184,7 @@ try {
             }
 
             $sql .= $groupBy . $orderBy . $limit;
-            //echo json_encode(['error' => true, 'data' => $sql]);
-            // break;
+
 
             try {
                 $stmt = $pdo->prepare($sql);
@@ -190,7 +213,7 @@ try {
                 break;
             }
 
-            // Get columns from the first row
+
             $columns = implode(', ', array_keys($data[0]));
             $placeholders = ':' . implode(', :', array_keys($data[0]));
             $sql = "INSERT INTO $table ($columns) VALUES ($placeholders)";
@@ -302,8 +325,8 @@ try {
             echo json_encode(['success' => $success, 'rowsAffected' => $stmt->rowCount()]);
             break;
         case 'BATCH-INSERT':
-        $data = json_decode($_POST['data'],true);
-          if (!is_array($data) || empty($data)) {
+            $data = json_decode($_POST['data'], true);
+            if (!is_array($data) || empty($data)) {
                 echo json_encode(['message' => "$data", 'error' => 'Invalid data']);
                 break;
             }
@@ -315,8 +338,7 @@ try {
                     $type = $batch['type'];
                     $data = $batch['data'];
                     if ($type === 'single') {
-                      insertRow($pdo, $table, $data);
-                      break;
+                        insertRow($pdo, $table, $data);
                     } elseif ($type === 'many') {
                         foreach ($data as $row) {
                             insertRow($pdo, $table, $row);
@@ -335,6 +357,44 @@ try {
                 echo json_encode(['error' => 'Transaction failed', 'message' => $e->getMessage()]);
             }
             break;
+        case "GET-DUAL-TABLE" :
+            $table1 = sanitizeIdentifier($_POST["table"]);
+            $table2 = sanitizeIdentifier($_POST["table2"]);
+
+
+
+
+            $table1Cols = buildColumns($table1select, $table1);
+            $table2Cols = buildColumns($table2select, $table2);
+
+            $selectClause = implode(", ", array_merge($table1Cols, $table2Cols));
+            $selectClause = empty($selectClause)?"*":$selectClause;
+
+            $basedOn = $basedOn ?? [];
+//            echo json_encode($basedOn[0]['func']);
+//            break;
+            $col1 = sanitizeIdentifier($basedOn[0]['table1'] ?? '');
+            $col2 = sanitizeIdentifier($basedOn[0]['table2'] ?? '');
+            $operator = in_array($basedOn[0]['func'], ['=', '<', '>', '<=', '>=']) ? $basedOn[0]['func'] : '=';
+
+            $whereCondition = "`$table1`.`$col1` $operator `$table2`.`$col2`";
+
+            $sql = "SELECT $selectClause FROM `$table1`, `$table2` WHERE $whereCondition";
+
+
+            try {
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute();
+                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                header('Content-Type: application/json');
+                echo json_encode($results);
+                break;
+            } catch (PDOException $e) {
+                echo json_encode(["error" => $e->getMessage()]);
+            }
+            break;
+
 
         default:
             echo json_encode(['error' => 'Invalid action']);
@@ -362,7 +422,7 @@ function insertRow(PDO $pdo, string $table, array $data): void
     $stmt->execute();
 }
 
-function generateUUIDv4()
+function generateUUIDv4(): string
 {
     return sprintf(
         '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
@@ -374,20 +434,25 @@ function generateUUIDv4()
     );
 }
 
-
-function testinsertRow(PDO $pdo, string $table, array $data): void
+function sanitizeIdentifier($val): array|string|null
 {
-    $columns = array_keys($data);
-    $placeholders = array_map(fn($col) => ':' . $col, $columns);
-
-    $sql = sprintf(
-        "INSERT INTO %s (%s) VALUES (%s)",
-        $table,
-        implode(', ', $columns),
-        implode(', ', $placeholders)
-    );
-   echo json_encode(['error' => 'Transaction failed', 'message' => $sql]);
-
+    return preg_replace('/[^a-zA-Z0-9_]/', '', $val);
 }
+function buildColumns($fields, $tableAlias): array
+{
+    $cols = [];
+    if(empty($fields)) {
+        return $cols;
+    }
+    foreach ($fields as $field) {
+        if (!isset($field['name'])) continue;
+        $name = sanitizeIdentifier($field['name']);
+        $alias = isset($field['as']) ? sanitizeIdentifier($field['as']) : $name;
+        $cols[] = "`$tableAlias`.`$name` AS `$alias`";
+    }
+    return $cols;
+}
+
+
 
 ?>

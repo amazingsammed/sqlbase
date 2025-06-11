@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:sqlbase/sqlbase.dart';
 
 import '../../utility/phpresponse.dart';
-import '../../utility/sqlbaseresponse.dart';
 import '../../utility/sqlmap.dart';
 
 part '../table/filters/where.dart';
@@ -33,7 +32,7 @@ class SqlTable {
   @visibleForTesting
   final String key;
   @visibleForTesting
-  final List<String>? select;
+  final List<Select>? select;
   @visibleForTesting
   final bool distinct;
 
@@ -81,11 +80,39 @@ class SqlTable {
 class SqlDualTable {
   SqlTable tableInfo;
   String secondTableName;
-  Compare data;
+  final List<Select>? select;
 
-  SqlDualTable(this.tableInfo, this.secondTableName, this.data);
+  final List<Map<String, dynamic>> _filterList = [];
+  SqlDualTable(this.tableInfo, this.secondTableName, this.select);
 
-  Future<SqlBaseResponse> get() async {
-    return SqlBaseResponse(statusCode: 200);
+
+  Future<SqlBaseResponse> get({required  Compare basedOn }) async {
+    try {
+      print(tableInfo.select);
+      final response = await http.post(
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        Uri.parse(tableInfo.url),
+        body: {
+          'key': tableInfo.key,
+          'action': 'GET-DUAL-TABLE',
+          'table': tableInfo.tableName,
+          'table2': secondTableName,
+          'table1-select': jsonEncode(tableInfo.select?.toMap()),
+          'table2-select': jsonEncode(select?.toMap()),
+          'based-on':jsonEncode([basedOn.toMap()]),
+          'conditions': jsonEncode(_filterList.isEmpty ? null : _filterList),
+        },
+      );
+      _filterList.clear();
+      print(response.body);
+      return phpResponse(response);
+    } catch (e) {
+      return SqlBaseResponse(
+        statusCode: 0,
+        error: e.toString(),
+      );
+    }
   }
 }

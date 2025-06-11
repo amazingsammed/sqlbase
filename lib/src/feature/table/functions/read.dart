@@ -25,14 +25,15 @@ extension SqlTableRead on SqlTable {
   Future<SqlBaseResponse> get() async {
     try {
       final response = await http.post(
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
         Uri.parse(url),
-        // headers: {
-        //   'Content-Type': 'application/x-www-form-urlencoded',
-        // },
         body: {
           'key': key,
           'action': 'TABLE-GET',
           'table': tableName,
+          'select': jsonEncode(select?.toMap()),
           'conditions': jsonEncode(_filterList.isEmpty ? null : _filterList),
         },
       );

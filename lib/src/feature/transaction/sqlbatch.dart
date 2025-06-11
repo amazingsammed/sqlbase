@@ -33,7 +33,7 @@ class SqlBatch {
   commit() async {
 
     try {
-      print(_list);
+
       final response = await http.post(
         Uri.parse(url),
         body: {

@@ -30,19 +30,14 @@ class SqlMap {
 
   @override
   String toString() {
-    return 'SqlMap{' +
-        ' type: $type,' +
-        ' field: $field,' +
-        ' function: $function,' +
-        ' value: $value,' +
-        '}';
+    return 'SqlMap{' ' type: $type,' ' field: $field,' ' function: $function,' ' value: $value,' '}';
   }
 
   SqlMap copyWith({
     String? type,
     String? field,
     String? function,
-    dynamic? value,
+    dynamic value,
   }) {
     return SqlMap(
       type: type ?? this.type,
