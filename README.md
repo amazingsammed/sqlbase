@@ -7,62 +7,63 @@ This is the repo
 https://github.com/amazingsammed/sqlbase
 
 # Usage
-
-* There a php file in the asset folder of this project, put it in your **http** directory or ***www folder*** of ***wampserver***
-* Make sure the php ***apikey***  match the one you are initializing
-```dart
-Sqlbase.initialize(url: "url_to_file.php", key: '123456')
+1. [Download PHP script](blob:https://github.com/7085519d-acfb-4f87-a739-50ee317c4c12)
+2. Put it in your **http** directory or ***www folder*** of ***wampserver***
+3. Change the initial configuration of the php file
+```php 
+$host = 'YourAddress';
+$dbname = 'YourDatatbaseName';
+$username = 'YourUsername';
+$password = 'YourPassword';
+/// this apikey must match with the one you provided
+/// in flutter intialization.
+$apiKey = '123456';
+```
+4. Initialize the plugin in your flutter app.
+ ```dart
+Sqlbase.initialize(url: "TheFile.php", key: '123456')
 ```
 
-# In Dart
-To use the plugin, run
+# A Complete Guide
+This is the basic complete guide to use sqlbase plugin made by Sammed Technologies
+
 ```dart
-//use this to initialize the plugin
+/// Initialize the plugin
 Sqlbase.initialize(url: "http://localhost/sqlbase.php", key: '123456');
-```
-# Queries
-This looks similar to firebase queries
-```dart
-// To  get all data from a table
-await myDB.table("tablename").get();
-```
-# Sample Code
-```
+
+
 final mydb = Sqlbase();
 
-final SqlTable businessDB = mydb.table('business');
-final SqlTable storeDB = mydb.table('stores');
-final SqlTable userstoreDB = mydb.table('user_store');
-final SqlTable userbusinessDB = mydb.table('user_business');
-final SqlTable users = mydb.table('users');
-final SqlTable stockItemDB = mydb.table('stock_item');
-final SqlTable categoryDB = mydb.table('stock_item_category');
-final SqlTable groupDB = mydb.table('stock_item_group');
-final SqlTable unitDB = mydb.table('stock_item_unit');
-final SqlTable voucherDB = mydb.table('voucher');
+// To  read all data from a table
+await myDB.table("tablename").get();
 
 
+// To  insert  data into a table
+await myDB.table("tablename").add(
+{
+    "name" : 'Flutter',
+    "year" : 2015
+});
 
- Future<List<Item>> getAllItems({required Store store}) async {
-    List<Item> items = [];
-    var data =
-        await stockItemDB.where('storeid', isEqualTo:store.storeid).where('busid', isEqualTo:store.busid).get();
-    for (var element in data.data['data']) {
-      items.add(Item.fromMap(element));
-    }
-    return items;
-  }
-  
-   Future<List<Groups>> getAllGroups({required Store store}) async {
-    List<Groups> items = [];
-    var data =
-        await groupDB.where('storeid',isEqualTo: store.storeid).where('busid', isEqualTo:store.busid).get();
-    for (var element in data.data['data']) {
-      items.add(Groups.fromMap(element));
-    }
-    return items;
-  }
+// To  update  data in a table
+await myDB.table("tablename").record("1",column:"id").update(
+{
+    "name" : 'Nextjs',
+    "year" : 2019
+});
+
+
+// To  delete  data in a table
+await myDB.table("tablename").record("1",column:"id").delete();
+
 ```
+
+# Methods for table
+- .where("name", isEqualto: "Sammed")
+- .isEqualTo("name":"Sammed")
+- .limit(10)
+- .orderBy("id","ASC")
+- .groupBy("gender")
 
 
 

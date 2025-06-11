@@ -1,4 +1,4 @@
-## 0.0.2
+## 0.0.3
 
 * TODO: Describe initial release.
-- Fixed the filter list thing
+- added togetherWith Functionality
