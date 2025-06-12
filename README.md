@@ -80,6 +80,10 @@ final myDB = Sqlbase();
 
 ```dart
 await myDB.table("users").get();
+
+//OR
+
+await SqlBase.select([]).from(tablename).execute();
 ```
 
 ### ➕ Insert Data
@@ -89,6 +93,12 @@ await myDB.table("users").add({
   "name": "Flutter",
   "year": 2015,
 });
+
+// OR
+
+await SqlBase.insertInto(tablename).values({
+    "name":"Sammed"
+}).execute();
 ```
 
 ### ✏️ Update Data
@@ -98,15 +108,36 @@ await myDB.table("users").record("1", column: "id").update({
   "name": "Next.js",
   "year": 2019,
 });
+
+// or
+
+await Sqlbase.update('user').where('id', '1').set({
+ "name": "Sammed"
+  }).execute();
 ```
 
 ### ❌ Delete Data
 
 ```dart
 await myDB.table("users").record("1", column: "id").delete();
+
+// or
+
+await Sqlbase.deleteFrom('user').where('id', '1').execute();
 ```
 
 ---
+
+## 🧰 Database Methods
+
+- `.table("column")`
+- `.select([])`
+- `.insertInto("tablename")`
+- `.deleteFrom("tablename")`
+- `.auth("tablename")`
+
+
+
 
 ## 🧰 Table Methods
 

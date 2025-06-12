@@ -30,10 +30,10 @@ class Home extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
             onPressed: () async {
-              var items = await myDB
-                  .table('customer')
-                  .togetherWith('chart_of_account')
-                  .get(basedOn: Compare('coa_uuid', SqlCompare.equalTo, "uuid"));
+              var data = await Sqlbase.update('user')
+                  .where('name', 'Sammed')
+                  .set({"name": "Sammed  Twumasi"}).execute();
+              print(data.toString());
             },
             child: Text('Try')),
       ),

@@ -38,6 +38,7 @@ extension SqlTableRead on SqlTable {
         },
       );
       _filterList.clear();
+      print(response.body);
       return phpResponse(response);
     } catch (e) {
 

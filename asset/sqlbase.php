@@ -31,6 +31,17 @@ try {
     $basedOn = isset($_POST['based-on']) ? json_decode($_POST['based-on'], true) : [];
     $uuid = generateUUIDv4();
 
+    $where = $_POST['where'] ?? '';
+    $orderBy = $_POST['orderBy'] ?? '';
+    $limit = $_POST['limit'] ?? '';
+    $joins = json_decode($_POST['joins'] ?? '[]', true);
+    $params = [];
+
+    function escapeIdentifier($input): array|string|null
+    {
+        return preg_replace('/[^a-zA-Z0-9_\\.]/', '', $input);
+    }
+
     // Validate inputs
     if (empty($action) || empty($table)) {
         die(json_encode(['error' => 'Missing action or table']));
@@ -115,6 +126,8 @@ try {
 
 
             $columns = [];
+            if(!empty($select)){
+
             foreach ($select as $field) {
                 if (!isset($field['name'])) continue;
 
@@ -122,6 +135,7 @@ try {
                 $alias = isset($field['as']) ? preg_replace('/[^a-zA-Z0-9_]/', '', $field['as']) : $colName;
 
                 $columns[] = "`$colName` AS `$alias`";
+            }
             }
 
 
@@ -393,6 +407,123 @@ try {
             } catch (PDOException $e) {
                 echo json_encode(["error" => $e->getMessage()]);
             }
+            break;
+
+        case 'select':
+            $select = json_decode($_POST['select'] ?? '[]', true);
+            $from   = json_decode($_POST['from'] ?? '[]', true);
+
+            if (empty($from)) {
+                echo json_encode(["error" => "FROM clause is required for SELECT."]);
+                exit;
+            }
+
+            $selectEscaped = empty($select) ? '*' : implode(", ", array_map('escapeIdentifier', $select));
+            $fromEscaped   = implode(", ", array_map('escapeIdentifier', $from));
+            $sql = "SELECT $selectEscaped FROM $fromEscaped";
+
+            if (!empty($joins)) {
+                foreach ($joins as $join) {
+                    if (!empty($join)) {
+                        $sql .= " $join";
+                    }
+                }
+            }
+
+            if (!empty($where)) {
+                $sql .= " WHERE $where";
+            }
+
+            if (!empty($orderBy)) {
+                $sql .= " ORDER BY " . escapeIdentifier($orderBy);
+            }
+
+            if (!empty($limit)) {
+                $sql .= " LIMIT " . intval($limit);
+            }
+
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC) ]);
+            break;
+
+        case 'insert':
+            $values = json_decode($_POST['values'] ?? '{}', true);
+
+            if (empty($table) || empty($values)) {
+                echo json_encode(["error" => "Table and values are required for INSERT."]);
+                exit;
+            }
+
+            $columns      = array_keys($values);
+            $placeholders = array_map(fn($c) => ":$c", $columns);
+            $sql = "INSERT INTO `" . escapeIdentifier($table) . "` (" .
+                implode(", ", array_map('escapeIdentifier', $columns)) .
+                ") VALUES (" . implode(", ", $placeholders) . ")";
+
+            $stmt = $pdo->prepare($sql);
+            foreach ($values as $col => $val) {
+                $stmt->bindValue(":$col", $val, is_null($val) ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            }
+            $stmt->execute();
+            echo json_encode(["success" => true, "insert_id" => $pdo->lastInsertId()]);
+            break;
+
+        case 'update':
+            $set = json_decode($_POST['set'] ?? '{}', true);
+
+            if (empty($table) || empty($set)) {
+                echo json_encode(["error" => "Table and SET values are required for UPDATE."]);
+                exit;
+            }
+
+            $setClauses = [];
+            foreach ($set as $col => $val) {
+                $ph = ":set_$col";
+                $setClauses[] = "`" . escapeIdentifier($col) . "` = $ph";
+                $params["set_$col"] = $val;
+            }
+
+            $sql = "UPDATE `" . escapeIdentifier($table) . "` SET " . implode(", ", $setClauses);
+
+            if (isset($_POST['column'])&& isset($_POST['value'])) {
+                $c = $_POST['column'];
+                $v = $_POST['value'];
+                $where = escapeIdentifier($c) . ' = '  ."'".escapeIdentifier($v)."'";
+                $sql .= " WHERE $where";
+            }else{
+                echo json_encode(["error" => true, "message" => "no conditions found"]);
+                break;
+            }
+
+            $stmt = $pdo->prepare($sql);
+            foreach ($params as $k => $v) {
+                $stmt->bindValue(":$k", $v, is_null($v) ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            }
+            $stmt->execute();
+            echo json_encode(["success" => true, "affected_rows" => $stmt->rowCount()]);
+            break;
+
+        case 'delete':
+            if (empty($table)) {
+                echo json_encode(["error" => "Table is required for DELETE."]);
+                exit;
+            }
+
+            $sql = "DELETE FROM `" . escapeIdentifier($table) . "`";
+            if (isset($_POST['column'])&& isset($_POST['value'])) {
+                $c = $_POST['column'];
+                $v = $_POST['value'];
+                $where = escapeIdentifier($c) . ' = '  ."'".escapeIdentifier($v)."'";
+                $sql .= " WHERE $where";
+            }else{
+                echo json_encode(["error" => true, "message" => "no conditions found"]);
+                break;
+            }
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute();
+            echo json_encode(["success" => true, "affected_rows" => $stmt->rowCount()]);
             break;
 
 
