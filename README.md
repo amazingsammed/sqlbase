@@ -20,7 +20,7 @@ Add `sqlbase` to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  sqlbase: 0.0.3^ # Replace with the latest version
+  sqlbase: 0.0.4^ # Replace with the latest version
 ```
 
 Then run:

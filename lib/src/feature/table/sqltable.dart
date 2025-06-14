@@ -88,7 +88,6 @@ class SqlDualTable {
 
   Future<SqlBaseResponse> get({required  Compare basedOn }) async {
     try {
-      print(tableInfo.select);
       final response = await http.post(
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -106,7 +105,6 @@ class SqlDualTable {
         },
       );
       _filterList.clear();
-      print(response.body);
       return phpResponse(response);
     } catch (e) {
       return SqlBaseResponse(
