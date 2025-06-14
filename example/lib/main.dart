@@ -30,10 +30,31 @@ class Home extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
             onPressed: () async {
-              var data = await Sqlbase.update('user')
-                  .where('name', 'Sammed')
-                  .set({"name": "Sammed  Twumasi"}).execute();
-              print(data.toString());
+              // var data = await Sqlbase.update('user')
+              //     .where('name', 'Sammed')
+              //     .set({"name": "Sammed  Twumasi"}).execute();
+              // print(data.toString());
+              Sqlbase.createTable([
+                DBTable(
+                  name:"Users",
+                  column: [
+                    DBColumn("id",type: ColumnType.int,length:11,isPrimary:true,autoIncrement:true),
+                    DBColumn("name",type: ColumnType.varChar,length:225),
+                    DBColumn("email",type: ColumnType.varChar,length:225),
+                    DBColumn("createddate",type: ColumnType.date),
+                  ]
+                ),
+                DBTable(
+                    name:"Business",
+                    column: [
+                      DBColumn("id",type: ColumnType.int,isPrimary:true,autoIncrement:true),
+                      DBColumn("id",type: ColumnType.int,foreignKey:'Users.id',autoIncrement:true),
+                      DBColumn("name",type: ColumnType.varChar),
+                      DBColumn("address",type: ColumnType.varChar),
+                      DBColumn("createddate",type: ColumnType.date),
+                    ]
+                ),
+              ]);
             },
             child: Text('Try')),
       ),

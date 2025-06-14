@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:sqlbase/src/feature/authentication/sqlauth.dart';
 export  'package:sqlbase/src/models/selectModel.dart';
 
 
 import '../sqlbase.dart';
+export  'feature/create_table/dbtable.dart';
 import 'feature/raw/rawsql.dart';
 import 'feature/transaction/sqlbatch.dart';
 
@@ -27,6 +30,18 @@ class Sqlbase {
     _url = url;
     _key = key;
   }
+
+
+    static void createTable(List<DBTable> tables, {String outputPath = 'schema.sql'}) {
+      final buffer = StringBuffer();
+      for (final table in tables) {
+        buffer.writeln(table.toCreateTableSql());
+        buffer.writeln();
+      }
+      final file = File(outputPath);
+      file.writeAsStringSync(buffer.toString());
+  }
+
 
   /// Returns an instance of [SqlTable] for interacting with a specific table.
   ///
