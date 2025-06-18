@@ -51,6 +51,21 @@ try {
     }
 
     switch ($action) {
+        case "RAWQUERY":
+            if(!isset($_POST['command'])){
+                echo json_encode(['error' => true, 'data' => "invalid command"]);
+                break;
+            }
+            $sql = $_POST['command'];
+            if(stripos(strtolower($sql), 'delete') !== false||stripos(strtolower($sql), 'update') !== false){
+                echo json_encode(['error' => true, 'data' => "Delete and update commands are not supported"]);
+                break;
+            }
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute();
+            echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+            break;
+
         case "SIGN-UP":
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
@@ -528,7 +543,7 @@ try {
 
 
         default:
-            echo json_encode(['error' => 'Invalid action']);
+            echo json_encode(['error' => 'Invalid action, consult the database administrator.']);
     }
 } catch (PDOException $e) {
     echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);

@@ -6,6 +6,7 @@ export  'package:sqlbase/src/models/selectModel.dart';
 
 import '../sqlbase.dart';
 export  'feature/create_table/dbtable.dart';
+import 'feature/raw/rawquery.dart';
 import 'feature/raw/rawsql.dart';
 import 'feature/transaction/sqlbatch.dart';
 
@@ -142,6 +143,11 @@ class Sqlbase {
     if (_url == null || _key == null) {
       throw Exception('Sqlbase not initialized. Call Sqlbase.initialize first.');
     }
+  }
+
+  static RawQuery rawQuery(String command) {
+    _checkInitialized();
+    return RawQuery(_url!, _key!, command);
   }
 }
 
