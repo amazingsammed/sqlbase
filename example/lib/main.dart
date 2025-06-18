@@ -52,11 +52,99 @@ class Home extends StatelessWidget {
               //   ),
               // ]);
 
-           SqlBaseResponse data=  await Sqlbase.rawQuery("Select * from user delete").execute();
-           print(data.toString());
+              SqlBaseResponse data =
+                  await Sqlbase.rawQuery("Select * from user delete").execute();
+              print(data.toString());
             },
             child: Text('Try')),
       ),
     );
+  }
+}
+insertRecord() async {
+  var data = await Sqlbase.insertInto('users').values({'name': "Sammed", 'from': 'Ghana'}).execute();
+
+  if (data.statusCode != 200) {
+    print(data.error);
+    print(data.message);
+  }
+}
+selectRecord() async {
+  var data = await Sqlbase.select([]).from(['users']).execute();
+
+  if (data.statusCode != 200) {
+    print(data.error);
+    print(data.message);
+  }
+}
+
+updateRecord() async {
+  var data = await Sqlbase.update('user').where('id', "25").execute();
+
+  if (data.statusCode != 200) {
+    print(data.error);
+    print(data.message);
+  }
+}
+
+deleteRecord() async {
+  var data = await Sqlbase.deleteFrom('user').where('id', "25").execute();
+
+  if (data.statusCode != 200) {
+    print(data.error);
+    print(data.message);
+  }
+}
+
+rawQuery() async {
+  var data = await Sqlbase.rawQuery("Select * from users").execute();
+
+  if (data.statusCode != 200) {
+    print(data.error);
+    print(data.message);
+  }
+}
+
+
+
+createRecordEasy() async {
+  Sqlbase myDB = Sqlbase();
+  var data = await myDB.table('user').add({'name': "Sammed", 'from': 'Ghana'});
+  if (data.statusCode != 200) {
+    print(data.error);
+    print(data.message);
+  }
+}
+
+createRecordManyEasy() async {
+  Sqlbase myDB = Sqlbase();
+  var data = await myDB.table('user').addMany([
+    {'name': "Sammed", 'from': 'Ghana'},
+    {'name': "Ronaldo", 'from': 'Portugal'},
+    {'name': "MBS", 'from': 'Saudi Arabia'}
+  ]);
+  if (data.statusCode != 200) {
+    print(data.error);
+    print(data.message);
+  }
+}
+
+updateRecordEasy() async {
+  Sqlbase myDB = Sqlbase();
+  var data = await myDB.table('user').record(1, column: 'id').update(
+    {'name': "Sammed", 'from': 'Ghana'},
+  );
+  if (data.statusCode != 200) {
+    print(data.error);
+    print(data.message);
+  }
+}
+
+deleteRecordEasy() async {
+  Sqlbase myDB = Sqlbase();
+  var data = await myDB.table('user').record(1, column: 'id').delete();
+  if (data.statusCode != 200) {
+    print(data.error);
+    print(data.message);
   }
 }

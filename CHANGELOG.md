@@ -1,4 +1,3 @@
-## 0.0.3
+## 0.0.6
 
-* TODO: Describe initial release.
-- added togetherWith Functionality
+* Raw Query added and fully functional

@@ -1,3 +1,3 @@
 
 
-double version = 1.0;
+dynamic version = '0.0.6';
