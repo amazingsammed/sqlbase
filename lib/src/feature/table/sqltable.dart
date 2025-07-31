@@ -78,15 +78,16 @@ class SqlTable {
 }
 
 class SqlDualTable {
-  SqlTable tableInfo;
-  String secondTableName;
+  final SqlTable tableInfo;
+  final String secondTableName;
   final List<Select>? select;
 
-  final List<Map<String, dynamic>> _filterList = [];
-  SqlDualTable(this.tableInfo, this.secondTableName, this.select);
+  final List<Map<String, dynamic>> _filterList ;
+  SqlDualTable(this.tableInfo, this.secondTableName, this.select,this._filterList);
 
 
   Future<SqlBaseResponse> get({required  Compare basedOn }) async {
+    print(jsonEncode(_filterList.isEmpty ? null : _filterList));
     try {
       final response = await http.post(
         headers: {

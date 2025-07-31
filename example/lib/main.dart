@@ -30,36 +30,51 @@ class Home extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
             onPressed: () async {
-              // Sqlbase.createTable([
-              //   DBTable(
-              //     name:"Users",
-              //     column: [
-              //       DBColumn("id",type: ColumnType.int,length:11,isPrimary:true,autoIncrement:true),
-              //       DBColumn("name",type: ColumnType.varChar,length:225),
-              //       DBColumn("email",type: ColumnType.varChar,length:225),
-              //       DBColumn("createddate",type: ColumnType.date),
-              //     ]
-              //   ),
-              //   DBTable(
-              //       name:"Business",
-              //       column: [
-              //         DBColumn("id",type: ColumnType.int,isPrimary:true,autoIncrement:true),
-              //         DBColumn("id",type: ColumnType.int,foreignKey:'Users.id',autoIncrement:true),
-              //         DBColumn("name",type: ColumnType.varChar),
-              //         DBColumn("address",type: ColumnType.varChar),
-              //         DBColumn("createddate",type: ColumnType.date),
-              //       ]
-              //   ),
-              // ]);
+              SqlBaseResponse data  = await Sqlbase()
+                  .table('voucher')
+                  .where('status', isEqualTo: '1')
+                  .togetherWith("user",select: [Select('name',as: "sammed")])
+                  .get(basedOn: Compare('createdby', SqlCompare.equalTo, 'userid'));
 
-              SqlBaseResponse data =
-                  await Sqlbase.rawQuery("Select * from user delete").execute();
-              print(data.toString());
+              print(data);
+
             },
             child: Text('Try')),
       ),
     );
   }
+}
+
+
+
+
+
+
+
+
+
+createTable(){
+  Sqlbase.createTable([
+    DBTable(
+      name:"Users",
+      column: [
+        DBColumn("id",type: ColumnType.int,length:11,isPrimary:true,autoIncrement:true),
+        DBColumn("name",type: ColumnType.varChar,length:225),
+        DBColumn("email",type: ColumnType.varChar,length:225),
+        DBColumn("createddate",type: ColumnType.date),
+      ]
+    ),
+    DBTable(
+        name:"Business",
+        column: [
+          DBColumn("id",type: ColumnType.int,isPrimary:true,autoIncrement:true),
+          DBColumn("id",type: ColumnType.int,foreignKey:'Users.id',autoIncrement:true),
+          DBColumn("name",type: ColumnType.varChar),
+          DBColumn("address",type: ColumnType.varChar),
+          DBColumn("createddate",type: ColumnType.date),
+        ]
+    ),
+  ]);
 }
 insertRecord() async {
   var data = await Sqlbase.insertInto('users').values({'name': "Sammed", 'from': 'Ghana'}).execute();
@@ -76,6 +91,7 @@ selectRecord() async {
     print(data.error);
     print(data.message);
   }
+  print(data.toString());
 }
 
 updateRecord() async {

@@ -6,7 +6,7 @@ extension SqlTogetherWith on SqlTable{
 
   SqlDualTable togetherWith(String table,{ List<Select>? select}){
 
-    return SqlDualTable(SqlTable(tableName, url, key,select: this.select),table,select);
+    return SqlDualTable(SqlTable(tableName, url, key,select: this.select),table,select,_filterList);
   }
 }
 
