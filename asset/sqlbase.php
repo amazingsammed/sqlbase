@@ -3,6 +3,7 @@ header('Content-Type: application/json');
 
 $host = 'localhost';
 $dbname = 'store_app';
+//$dbname = 'flavour_db';
 $username = 'root';
 $password = '';
 $apiKey = '123456';
@@ -133,7 +134,6 @@ try {
             break;
 
         case 'TABLE-GET':
-            // Validate table name to avoid SQL injection
             if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) {
                 echo json_encode(['error' => true, 'message' => 'Invalid table name']);
                 break;
@@ -396,7 +396,7 @@ try {
             $table1Cols = buildColumns($table1select, $table1);
             $table2Cols = buildColumns($table2select, $table2);
 
-            $selectClause = implode(", ", array_merge($table1Cols, $table2Cols));
+            $selectClause = implode(", ", array_merge(empty($table1Cols)?["`".$table1."`" . ".*"]:$table1Cols, empty($table2Cols)?["`".$table2."`" . ".*"]:$table2Cols));
             $selectClause = empty($selectClause)?"*":$selectClause;
 
             $basedOn = $basedOn ?? [];
@@ -406,18 +406,69 @@ try {
             $col2 = sanitizeIdentifier($basedOn[0]['table2'] ?? '');
             $operator = in_array($basedOn[0]['func'], ['=', '<', '>', '<=', '>=']) ? $basedOn[0]['func'] : '=';
 
-            $whereCondition = "`$table1`.`$col1` $operator `$table2`.`$col2`";
+            $whereClauses = [];
+            $orderBy = '';
+            $groupBy = '';
+            $limit = '';
+            $paramIndex = 0;
 
-            $sql = "SELECT $selectClause FROM `$table1`, `$table2` WHERE $whereCondition";
+            if (!empty($conditions) && is_array($conditions)) {
+                foreach ($conditions as $element) {
+                    $type = strtolower($element['type'] ?? '');
+                    $field = $element['field'] ?? '';
+                    $operator = strtoupper(trim($element['function'] ?? '='));
+                    $value = $element['value'] ?? '';
+
+                    // Validate field name
+                    if (!preg_match('/^[a-zA-Z0-9_]+$/', $field)) {
+                        continue;
+                    }
+
+                    if ($type === 'where') {
+                        $allowedOperators = ['=', '!=', '<', '<=', '>', '>=', 'LIKE'];
+                        if (!in_array($operator, $allowedOperators)) {
+                            $operator = '=';
+                        }
+                        $paramName = ":param$paramIndex";
+                        $whereClauses[] = "$table1.`$field` $operator '$value'";
+                        $params[$paramName] = $value;
+                        $paramIndex++;
+                    } elseif ($type === 'groupby') {
+                        $groupBy = " GROUP BY `$value`";
+                    } elseif ($type === 'orderby') {
+                        $dir = strtoupper($operator);
+                        if (!in_array($dir, ['ASC', 'DESC'])) $dir = 'ASC';
+                        $orderBy = " ORDER BY `$value` $dir";
+                    } elseif ($type === 'limit') {
+                        if (is_numeric($value)) {
+                            $limit = " LIMIT " . intval($value);
+                        }
+                    } elseif ($type === 'offset') {
+                        if (is_numeric($value)) {
+                            $limit .= " OFFSET " . intval($value);
+                        }
+                    }
+                }
+            }
 
 
+            $whereCondition = "`$table1`.`$col1` $operator `$table2`.`$col2` ";
+
+            $sql = "SELECT Distinct $selectClause FROM `$table1`, `$table2` WHERE $whereCondition";
+            if (!empty($whereClauses)) {
+                $sql .= " And ". implode(' AND ', $whereClauses);
+            }
+
+     //   echo json_encode(['error' => true, 'data' => $sql]);
+         //  break;
             try {
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute();
                 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 header('Content-Type: application/json');
-                echo json_encode($results);
+                echo json_encode(['success' => true, 'data' => $results]);
+                //echo json_encode($results);
                 break;
             } catch (PDOException $e) {
                 echo json_encode(["error" => $e->getMessage()]);
