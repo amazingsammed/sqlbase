@@ -1,12 +1,12 @@
 import 'package:sqlbase/src/feature/create_table/table_column.dart';
 export  'package:sqlbase/src/feature/create_table/table_column.dart';
 
-class DBTable {
+class SQLTable {
   final String name;
-  final List<DBColumn> column;
+  final List<TableColumn> column;
   final List<String> compositePrimaryKeys;
 
-  DBTable({
+  SQLTable({
     required this.name,
     required this.column,
     this.compositePrimaryKeys = const [],

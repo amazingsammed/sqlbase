@@ -1,6 +1,6 @@
 # SQLbase
 
-**SQLbase** is a lightweight Flutter plugin that enables seamless communication between a Flutter app and an SQL database through a simple PHP back-end. It’s designed to function similarly to Firebase queries, making it easy and intuitive to use.
+**SQLbase** is a lightweight Flutter plugin that enables seamless communication between a Flutter app and an SQL database through a simple PHP backend. It’s designed to function similarly to Firebase queries, making it easy and intuitive to use.
 
 
 

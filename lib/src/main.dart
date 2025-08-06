@@ -5,7 +5,8 @@ export  'package:sqlbase/src/models/selectModel.dart';
 
 
 import '../sqlbase.dart';
-export  'feature/create_table/dbtable.dart';
+export  'feature/create_table/sql_table.dart';
+import 'feature/create_table/sql_table.dart';
 import 'feature/raw/rawquery.dart';
 import 'feature/raw/rawsql.dart';
 import 'feature/transaction/sqlbatch.dart';
@@ -33,7 +34,7 @@ class Sqlbase {
   }
 
 
-    static void createTable(List<DBTable> tables, {String outputPath = 'schema.sql'}) {
+    static void createTable(List<SQLTable> tables, {String outputPath = 'schema.sql'}) {
       final buffer = StringBuffer();
       for (final table in tables) {
         buffer.writeln(table.toCreateTableSql());

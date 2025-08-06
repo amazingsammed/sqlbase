@@ -1,4 +1,4 @@
-enum ColumnType {
+enum DataType {
   int,
   varChar,
   date,
@@ -6,25 +6,25 @@ enum ColumnType {
   bool,
 }
 
-String columnTypeToString(ColumnType type, [int? length]) {
+String columnTypeToString(DataType type, [int? length]) {
   switch (type) {
-    case ColumnType.int:
+    case DataType.int:
       return 'INT';
-    case ColumnType.varChar:
+    case DataType.varChar:
       return 'VARCHAR(${length ?? 255})';
-    case ColumnType.date:
+    case DataType.date:
       return 'DATE';
-    case ColumnType.text:
+    case DataType.text:
       return 'TEXT';
-    case ColumnType.bool:
+    case DataType.bool:
       return 'BOOLEAN';
   }
 }
 
 
-class DBColumn {
+class TableColumn {
   final String name;
-  final ColumnType type;
+  final DataType type;
   final int? length;
   final bool isPrimary;
   final bool isNullable;
@@ -36,7 +36,7 @@ class DBColumn {
   final String? onDelete;
   final String? onUpdate;
 
-  DBColumn(
+  TableColumn(
       this.name, {
         required this.type,
         this.length,
@@ -71,7 +71,7 @@ class DBColumn {
   String? foreignKeyConstraint() {
     if (!hasForeignKey) return null;
     String clause =
-        'FOREIGN KEY (`$name`) REFERENCES `${referencedTable}`(`${referencedColumn}`)';
+        'FOREIGN KEY (`$name`) REFERENCES `$referencedTable`(`$referencedColumn`)';
     if (onDelete != null) clause += ' ON DELETE $onDelete';
     if (onUpdate != null) clause += ' ON UPDATE $onUpdate';
     return clause;

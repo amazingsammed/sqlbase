@@ -29,11 +29,7 @@ class Home extends StatelessWidget {
       appBar: AppBar(),
       body: Center(
         child: ElevatedButton(
-            onPressed: () async {
-              SqlBaseResponse data  = await Sqlbase()
-                  .table('voucher').leftJoin("items",select:[Select("name",as: "Name")]).basedOn(table1:"uuid",table2:"item");
-
-            },
+            onPressed: createTable,
             child: Text('Try')),
       ),
     );
@@ -50,23 +46,23 @@ class Home extends StatelessWidget {
 
 createTable(){
   Sqlbase.createTable([
-    DBTable(
+    SQLTable(
       name:"Users",
       column: [
-        DBColumn("id",type: ColumnType.int,length:11,isPrimary:true,autoIncrement:true),
-        DBColumn("name",type: ColumnType.varChar,length:225),
-        DBColumn("email",type: ColumnType.varChar,length:225),
-        DBColumn("createddate",type: ColumnType.date),
+        TableColumn("id",type: DataType.int,length:11,isPrimary:true,autoIncrement:true),
+        TableColumn("name",type: DataType.varChar,length:225),
+        TableColumn("email",type: DataType.varChar,length:225),
+        TableColumn("createddate",type: DataType.date),
       ]
     ),
-    DBTable(
+    SQLTable(
         name:"Business",
         column: [
-          DBColumn("id",type: ColumnType.int,isPrimary:true,autoIncrement:true),
-          DBColumn("id",type: ColumnType.int,foreignKey:'Users.id',autoIncrement:true),
-          DBColumn("name",type: ColumnType.varChar),
-          DBColumn("address",type: ColumnType.varChar),
-          DBColumn("createddate",type: ColumnType.date),
+          TableColumn("id",type: DataType.int,isPrimary:true,autoIncrement:true),
+          TableColumn("userid",type: DataType.int,foreignKey:'Users.id',autoIncrement:true),
+          TableColumn("name",type: DataType.varChar),
+          TableColumn("address",type: DataType.varChar),
+          TableColumn("createddate",type: DataType.date),
         ]
     ),
   ]);
@@ -75,26 +71,22 @@ insertRecord() async {
   var data = await Sqlbase.insertInto('users').values({'name': "Sammed", 'from': 'Ghana'}).execute();
 
   if (data.statusCode != 200) {
-    print(data.error);
-    print(data.message);
+
   }
 }
 selectRecord() async {
   var data = await Sqlbase.select([]).from(['users']).execute();
 
   if (data.statusCode != 200) {
-    print(data.error);
-    print(data.message);
+
   }
-  print(data.toString());
+
 }
 
 updateRecord() async {
   var data = await Sqlbase.update('user').where('id', "25").execute();
 
   if (data.statusCode != 200) {
-    print(data.error);
-    print(data.message);
   }
 }
 
@@ -102,8 +94,6 @@ deleteRecord() async {
   var data = await Sqlbase.deleteFrom('user').where('id', "25").execute();
 
   if (data.statusCode != 200) {
-    print(data.error);
-    print(data.message);
   }
 }
 
@@ -111,8 +101,6 @@ rawQuery() async {
   var data = await Sqlbase.rawQuery("Select * from users").execute();
 
   if (data.statusCode != 200) {
-    print(data.error);
-    print(data.message);
   }
 }
 
@@ -122,8 +110,6 @@ createRecordEasy() async {
   Sqlbase myDB = Sqlbase();
   var data = await myDB.table('user').add({'name': "Sammed", 'from': 'Ghana'});
   if (data.statusCode != 200) {
-    print(data.error);
-    print(data.message);
   }
 }
 
@@ -135,8 +121,6 @@ createRecordManyEasy() async {
     {'name': "MBS", 'from': 'Saudi Arabia'}
   ]);
   if (data.statusCode != 200) {
-    print(data.error);
-    print(data.message);
   }
 }
 
@@ -146,8 +130,6 @@ updateRecordEasy() async {
     {'name': "Sammed", 'from': 'Ghana'},
   );
   if (data.statusCode != 200) {
-    print(data.error);
-    print(data.message);
   }
 }
 
@@ -155,7 +137,5 @@ deleteRecordEasy() async {
   Sqlbase myDB = Sqlbase();
   var data = await myDB.table('user').record(1, column: 'id').delete();
   if (data.statusCode != 200) {
-    print(data.error);
-    print(data.message);
   }
 }

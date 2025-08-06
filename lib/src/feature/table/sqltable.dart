@@ -95,6 +95,7 @@ class SqlJoinTable {
             'table2': secondTableName,
             'table1-select': jsonEncode(tableInfo.select?.toMap()),
             'table2-select': jsonEncode(select?.toMap()),
+            "others": table_1 + table_2
 
           }
         },

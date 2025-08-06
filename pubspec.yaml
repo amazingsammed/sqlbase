@@ -1,6 +1,6 @@
 name: sqlbase
-description: "Dart to php to Sql database"
-version: 0.0.6
+description: "SQLBase is a lightweight Flutter plugin that enables seamless communication between a Flutter app and an SQL database through a simple PHP back-end"
+version: 0.0.7
 homepage:
 
 environment:
