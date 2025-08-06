@@ -26,6 +26,16 @@ class SqlRecord {
       throw Exception('You need to specify the row-Id and Column in row');
     }
     try {
+      print({
+        'key': table.key,
+        'action': 'RECORD-UPDATE',
+        'table': table.tableName,
+        'data': jsonEncode(data),
+        'conditions': jsonEncode([{
+          "field":columName.toString(),
+          "value":recordID
+        }]),
+      });
       final response = await http.post(
         Uri.parse(table.url),
         body: {

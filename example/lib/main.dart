@@ -31,12 +31,7 @@ class Home extends StatelessWidget {
         child: ElevatedButton(
             onPressed: () async {
               SqlBaseResponse data  = await Sqlbase()
-                  .table('voucher')
-                  .where('status', isEqualTo: '1')
-                  .togetherWith("user",select: [Select('name',as: "sammed")])
-                  .get(basedOn: Compare('createdby', SqlCompare.equalTo, 'userid'));
-
-              print(data);
+                  .table('voucher').leftJoin("items",select:[Select("name",as: "Name")]).basedOn(table1:"uuid",table2:"item");
 
             },
             child: Text('Try')),

@@ -1,8 +1,8 @@
 # SQLbase
 
-**SQLbase** is a lightweight Flutter plugin that enables seamless communication between a Flutter app and an SQL database through a simple PHP backend. It’s designed to function similarly to Firebase queries, making it easy and intuitive to use.
+**SQLbase** is a lightweight Flutter plugin that enables seamless communication between a Flutter app and an SQL database through a simple PHP back-end. It’s designed to function similarly to Firebase queries, making it easy and intuitive to use.
 
----
+
 
 ## 🚀 Features
 
@@ -12,7 +12,7 @@
 - Supports CRUD operations (Create, Read, Update, Delete)
 - Supports advanced SQL features like filtering, ordering, and grouping
 
----
+
 
 ## 📦 Installation
 
@@ -29,14 +29,13 @@ Then run:
 flutter pub get
 ```
 
----
+
 
 ## ⚙️ Setup Guide
 
 ### 1. Download the PHP Script
 **Link**  - https://github.com/amazingsammed/sqlbase/blob/master/asset/sqlbase.php
 
-👉 [Download the PHP Script](blob\:https://github.com/7085519d-acfb-4f87-a739-50ee317c4c12)
 
 ### 2. Deploy the Script
 
@@ -50,83 +49,46 @@ Place the downloaded PHP file in your server’s root directory:
 Open the script and set your database configuration:
 
 ```php
-$host = 'YourAddress';
-$dbname = 'YourDatabaseName';
-$username = 'YourUsername';
-$password = 'YourPassword';
+$host = 'Your_Address';
+$dbname = 'Your_Database_Name';
+$username = 'Your_Username';
+$password = 'Your_Password';
 
 // API key must match the one used in your Flutter app
 $apiKey = '123456';
 ```
-
-### 4. Initialize the Plugin in Flutter
-
-```dart
-Sqlbase.initialize(url: "http://localhost/sqlbase.php", key: '123456');
-```
-
----
 
 ## 📘 Usage Guide
 
 ### Initialize
 
 ```dart
-Sqlbase.initialize(url: "http://localhost/sqlbase.php", key: '123456');
+final Sqlbase.initialize(url: "http://localhost/sqlbase.php", key: '123456');
 final myDB = Sqlbase();
-```
 
-### 🔍 Read Data
-
-```dart
+/// 🔍 Read Data
 await myDB.table("users").get();
 
-//OR
-
-await SqlBase.select([]).from(tablename).execute();
-```
-
-### ➕ Insert Data
-
-```dart
+/// ➕ Insert Data
 await myDB.table("users").add({
   "name": "Flutter",
   "year": 2015,
 });
 
-// OR
-
-await SqlBase.insertInto(tablename).values({
-    "name":"Sammed"
-}).execute();
-```
-
-### ✏️ Update Data
-
-```dart
+/// ✏️ Update Data
 await myDB.table("users").record("1", column: "id").update({
   "name": "Next.js",
   "year": 2019,
 });
 
-// or
-
-await Sqlbase.update('user').where('id', '1').set({
- "name": "Sammed"
-  }).execute();
-```
-
-### ❌ Delete Data
-
-```dart
+/// ❌ Delete Data
 await myDB.table("users").record("1", column: "id").delete();
 
-// or
-
-await Sqlbase.deleteFrom('user').where('id', '1').execute();
 ```
 
----
+
+
+
 
 ## 🧰 Database Methods
 
@@ -155,16 +117,15 @@ await Sqlbase.deleteFrom('user').where('id', '1').execute();
 - `.update(Map<String, dynamic> newData)`
 - `.delete()`
 
----
+
 
 ## 📌 Best Practices
 
 - Ensure the API key in your PHP file and Flutter app **match**
 - Use HTTPS in production for secure communication
-- Validate all user inputs to prevent SQL injection
 - Use environment variables or a secure config file for DB credentials
 
----
+
 
 ## 💡 Examples
 
@@ -176,21 +137,7 @@ await myDB.table("products").where("price", isEqualTo: 100).get();
 await myDB.table("users").groupBy("gender").orderBy("id", "DESC").limit(5).get();
 ```
 
----
 
-## 🧪 Testing
-
-To test locally:
-
-1. Use a tool like **Postman** to verify the PHP script response
-2. Check database connection and permissions
-3. Enable PHP error display for debugging:
-   ```php
-   ini_set('display_errors', 1);
-   error_reporting(E_ALL);
-   ```
-
----
 
 ## 🤝 Contributing
 
@@ -198,7 +145,7 @@ We welcome contributions! Feel free to fork the repo and submit pull requests.
 
 🔗 GitHub: [https://github.com/amazingsammed/sqlbase](https://github.com/amazingsammed/sqlbase)
 
----
+
 
 ## 📄 License
 
