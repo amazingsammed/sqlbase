@@ -1,6 +1,6 @@
 name: sqlbase
 description: "SQLBase is a lightweight Flutter plugin that enables seamless communication between a Flutter app and an SQL database through a simple PHP back-end"
-version: 0.0.7
+version: 0.0.8
 homepage: "https://github.com/amazingsammed/sqlbase"
 repository: "https://github.com/amazingsammed/sqlbase"
 issue_tracker: "https://github.com/amazingsammed/sqlbase/issues"

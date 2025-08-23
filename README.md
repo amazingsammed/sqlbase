@@ -20,7 +20,7 @@ Add `sqlbase` to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  sqlbase: 0.0.4^ # Replace with the latest version
+  sqlbase: 0.0.8^ # Replace with the latest version
 ```
 
 Then run:
@@ -34,6 +34,9 @@ flutter pub get
 ## ⚙️ Setup Guide
 
 ### 1. Download the PHP Script
+# Old script
+**Link**  - https://github.com/amazingsammed/sqlbase/blob/master/asset/sqlbase.php
+# New script
 **Link**  - https://github.com/amazingsammed/sqlbase/blob/master/asset/sqlbase.php
 
 

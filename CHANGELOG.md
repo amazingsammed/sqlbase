@@ -1,3 +1,4 @@
 ## 0.0.8
 
-* Deprecating old queries
+* Deprecating some queries
+* Added encryption
