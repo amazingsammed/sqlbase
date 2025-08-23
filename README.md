@@ -66,22 +66,22 @@ $apiKey = '123456';
 final Sqlbase.initialize(url: "http://localhost/sqlbase.php", key: '123456');
 final myDB = Sqlbase();
 
-/// 🔍 Read Data
+///  Read Data
 await myDB.table("users").get();
 
-/// ➕ Insert Data
+///  Insert Data
 await myDB.table("users").add({
   "name": "Flutter",
   "year": 2015,
 });
 
-/// ✏️ Update Data
+///  Update Data
 await myDB.table("users").record("1", column: "id").update({
   "name": "Next.js",
   "year": 2019,
 });
 
-/// ❌ Delete Data
+///  Delete Data
 await myDB.table("users").record("1", column: "id").delete();
 
 ```
@@ -90,7 +90,7 @@ await myDB.table("users").record("1", column: "id").delete();
 
 
 
-## 🧰 Database Methods
+##  Database Methods
 
 - `.table("column")`
 - `.select([])`
@@ -101,7 +101,7 @@ await myDB.table("users").record("1", column: "id").delete();
 
 
 
-## 🧰 Table Methods
+##  Table Methods
 
 - `.where("column", isEqualTo: "value")`
 - `.isEqualTo({"column": "value"})`
@@ -112,14 +112,14 @@ await myDB.table("users").record("1", column: "id").delete();
 - `.add(Map<String, dynamic> data)`
 - `.addMany(List<Map<String, dynamic>> dataList)`
 
-## 🧾 Record Methods
+##  Record Methods
 
 - `.update(Map<String, dynamic> newData)`
 - `.delete()`
 
 
 
-## 📌 Best Practices
+##  Best Practices
 
 - Ensure the API key in your PHP file and Flutter app **match**
 - Use HTTPS in production for secure communication
@@ -127,7 +127,7 @@ await myDB.table("users").record("1", column: "id").delete();
 
 
 
-## 💡 Examples
+##  Examples
 
 ```dart
 // Read with condition

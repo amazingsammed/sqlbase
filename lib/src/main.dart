@@ -6,7 +6,6 @@ export  'package:sqlbase/src/models/selectModel.dart';
 
 import '../sqlbase.dart';
 export  'feature/create_table/sql_table.dart';
-import 'feature/create_table/sql_table.dart';
 import 'feature/raw/rawquery.dart';
 import 'feature/raw/rawsql.dart';
 import 'feature/transaction/sqlbatch.dart';
@@ -19,6 +18,7 @@ import 'feature/transaction/sqlbatch.dart';
 class Sqlbase {
   static String? _url;
   static String? _key;
+  static String? _encryptionKey;
 
   /// Initializes the SQLbase connection with the given [url] and [key].
   ///
@@ -28,9 +28,10 @@ class Sqlbase {
   /// ```dart
   /// Sqlbase.initialize(url: 'https://yourdomain.com/sql.php', key: 'your_api_key');
   /// ```
-  static void initialize({required String url, required String key}) {
+  static void initialize({required String url, required String key,String encryptionKey = "ILOVESQLBASE2025"}) {
     _url = url;
     _key = key;
+    _encryptionKey = encryptionKey;
   }
 
 
@@ -101,6 +102,7 @@ class Sqlbase {
   /// ```dart
   /// Sqlbase.select(['id', 'name']).from('users').where('id', isEqualTo: 5).get();
   /// ```
+  @Deprecated("use SqlBase().table(tablename).get()")
   static SelectFromStep select(List<String>? fields) {
     _checkInitialized();
     return SelectFromStep(_url!, _key!, fields);
@@ -112,6 +114,7 @@ class Sqlbase {
   /// ```dart
   /// Sqlbase.insertInto('users').values({'name': 'Alice'}).execute();
   /// ```
+  @Deprecated("use SqlBase().table(tablename).insert")
   static InsertQuery insertInto(String table) {
     _checkInitialized();
     return InsertQuery(_url!, _key!, table);
@@ -123,6 +126,7 @@ class Sqlbase {
   /// ```dart
   /// Sqlbase.update('users').set({'name': 'Bob'}).where('id', isEqualTo: 3).execute();
   /// ```
+  @Deprecated("use SqlBase().table(tablename).record(recordid).update")
   static UpdateQuery update(String table) {
     _checkInitialized();
     return UpdateQuery(_url!, _key!, table);
@@ -134,6 +138,7 @@ class Sqlbase {
   /// ```dart
   /// Sqlbase.deleteFrom('users').where('id', isEqualTo: 10).execute();
   /// ```
+  @Deprecated("use SqlBase().table(tablename).record(recordid).delete")
   static DeleteQuery deleteFrom(String table) {
     _checkInitialized();
     return DeleteQuery(_url!, _key!, table);
@@ -141,11 +146,14 @@ class Sqlbase {
 
   /// Ensures that SQLbase is initialized before allowing operations.
   static void _checkInitialized() {
-    if (_url == null || _key == null) {
+    if (_url == null || _key == null || _encryptionKey ==null) {
       throw Exception('Sqlbase not initialized. Call Sqlbase.initialize first.');
     }
+    if (_encryptionKey!.length!=16 ) {
+      throw Exception('Encryption key must be 16');
+    }
   }
-
+  @Deprecated("Not Recommended, only select statement works")
   static RawQuery rawQuery(String command) {
     _checkInitialized();
     return RawQuery(_url!, _key!, command);

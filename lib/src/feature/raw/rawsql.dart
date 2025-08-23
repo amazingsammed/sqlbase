@@ -237,6 +237,7 @@ class DeleteQuery implements ExecutableQuery {
           statusCode: 0, error: "you need to use the values method first");
     }
     try {
+
       final response = await http.post(
         Uri.parse(_url),
         body: {

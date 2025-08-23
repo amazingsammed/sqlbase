@@ -3,6 +3,7 @@ import 'package:sqlbase/src/feature/table/sqlrecord.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:sqlbase/sqlbase.dart';
+import 'package:sqlbase/src/utility/encrypt_request.dart';
 
 import '../../utility/phpresponse.dart';
 import '../../utility/sqlmap.dart';
@@ -19,15 +20,10 @@ part '../table/functions/create.dart';
 
 /// Represents a SQL table and operations on it.
 class SqlTable {
-  @visibleForTesting
   final String tableName;
-  @visibleForTesting
   final String url;
-  @visibleForTesting
   final String key;
-  @visibleForTesting
   final List<Select>? select;
-  @visibleForTesting
   final bool distinct;
 
   // Stores filters for future use (e.g., where conditions)
@@ -46,24 +42,24 @@ class SqlTable {
   }
 
   /// Converts this SqlTable instance into a Map (useful for serialization).
-  Map<String, dynamic> toMap() {
-    return {'tableName': tableName, 'url': url, 'key': key, 'select': select};
-  }
+ // Map<String, dynamic> toMap() {
+ //   return {'tableName': tableName, 'url': url, 'key': key, 'select': select};
+ // }
 
   /// Factory constructor to create SqlTable from a Map.
-  factory SqlTable.fromMap(Map<String, dynamic> map) {
-    if (!map.containsKey('tableName') ||
-        !map.containsKey('url') ||
-        !map.containsKey('key')) {
-      throw ArgumentError('Missing required fields in map for SqlTable');
-    }
-
-    return SqlTable(
-      map['tableName'] as String,
-      map['url'] as String,
-      map['key'] as String,
-    );
-  }
+  // factory SqlTable.fromMap(Map<String, dynamic> map) {
+  //   if (!map.containsKey('tableName') ||
+  //       !map.containsKey('url') ||
+  //       !map.containsKey('key')) {
+  //     throw ArgumentError('Missing required fields in map for SqlTable');
+  //   }
+  //
+  //   return SqlTable(
+  //     map['tableName'] as String,
+  //     map['url'] as String,
+  //     map['key'] as String,
+  //   );
+  // }
 
   SqlJoinTable leftJoin(String table2, {required List<Select> select}) {
     return SqlJoinTable(
@@ -82,24 +78,16 @@ class SqlJoinTable {
     String table_1 = "${tableInfo.tableName.trim()}.${table1.trim()}";
     String table_2 = "${secondTableName.trim()}.${table2.trim()}";
     try {
-      final response = await http.post(
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        Uri.parse(tableInfo.url),
-        body: {
-          'key': tableInfo.key,
-          'action': 'SQL-LEFT-JOIN',
-          "payload": {
-            'table': tableInfo.tableName,
-            'table2': secondTableName,
-            'table1-select': jsonEncode(tableInfo.select?.toMap()),
-            'table2-select': jsonEncode(select?.toMap()),
-            "others": table_1 + table_2
-
-          }
-        },
-      );
+      final response = await postData(url: tableInfo.url, key: tableInfo.key, data: {
+        'action': 'SQL-LEFT-JOIN',
+        "payload": {
+          'table': tableInfo.tableName,
+          'table2': secondTableName,
+          'table1-select': jsonEncode(tableInfo.select?.toMap()),
+          'table2-select': jsonEncode(select?.toMap()),
+          "others": table_1 + table_2
+        }
+      });
       return phpResponse(response);
     } catch (e) {
       return SqlBaseResponse(
@@ -122,22 +110,16 @@ class SqlDualTable {
 
   Future<SqlBaseResponse> get({required Compare basedOn}) async {
     try {
-      final response = await http.post(
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        Uri.parse(tableInfo.url),
-        body: {
-          'key': tableInfo.key,
-          'action': 'GET-DUAL-TABLE',
-          'table': tableInfo.tableName,
-          'table2': secondTableName,
-          'table1-select': jsonEncode(tableInfo.select?.toMap()),
-          'table2-select': jsonEncode(select?.toMap()),
-          'based-on': jsonEncode([basedOn.toMap()]),
-          'conditions': jsonEncode(_filterList.isEmpty ? null : _filterList),
-        },
-      );
+      final response = await postData(url: tableInfo.url, key: tableInfo.key, data: {
+        'key': tableInfo.key,
+        'action': 'GET-DUAL-TABLE',
+        'table': tableInfo.tableName,
+        'table2': secondTableName,
+        'table1-select': jsonEncode(tableInfo.select?.toMap()),
+        'table2-select': jsonEncode(select?.toMap()),
+        'based-on': jsonEncode([basedOn.toMap()]),
+        'conditions': jsonEncode(_filterList.isEmpty ? null : _filterList),
+      });
       _filterList.clear();
       return phpResponse(response);
     } catch (e) {

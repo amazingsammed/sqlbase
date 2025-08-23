@@ -2,6 +2,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../../utility/encrypt_request.dart';
 import '../../utility/phpresponse.dart';
 import '../../utility/sqlbaseresponse.dart';
 
@@ -18,10 +19,7 @@ class SqlAuth{
     email = email.trim();
     Map<String, dynamic> userMap = {};
     userMap.addAll({'action': 'SIGN-IN','table':tablename, 'email': email, 'password': password,'key':key});
-      final response = await http.post(
-        Uri.parse(url),
-        body: userMap,
-      );
+      final response = await postData(url: url, key: key, data: userMap);
       return phpResponse(response);
     } catch (e) {
       Exception(e);
@@ -34,11 +32,9 @@ class SqlAuth{
       password = password.trim();
       email = email.trim();
       Map<String, dynamic> userMap = {};
-      userMap.addAll({'action': 'SIGN-UP','table':tablename, 'email': email, 'password': password,'data':jsonEncode(data) ,'key':key});
-      final response = await http.post(
-        Uri.parse(url),
-        body: userMap,
-      );
+      userMap.addAll({'action': 'SIGN-UP','table':tablename, 'email': email, 'password': password,'data':jsonEncode(data) });
+      final response = await postData(url: url, key: key, data: userMap);
+
       return phpResponse(response);
     } catch (e) {
       Exception(e);

@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:sqlbase/sqlbase.dart';
 import 'package:http/http.dart' as http;
+import '../../utility/encrypt_request.dart';
 import '../../utility/phpresponse.dart';
 
 class SqlRecord {
@@ -26,19 +27,17 @@ class SqlRecord {
       throw Exception('You need to specify the row-Id and Column in row');
     }
     try {
-      final response = await http.post(
-        Uri.parse(table.url),
-        body: {
-          'key': table.key,
-          'action': 'RECORD-UPDATE',
-          'table': table.tableName,
-          'data': jsonEncode(data),
-          'conditions': jsonEncode([{
-            "field":columName.toString(),
-            "value":recordID
-          }]),
-        },
-      );
+      final response = await postData(url: table.url, key: table.key, data: {
+        'key': table.key,
+        'action': 'RECORD-UPDATE',
+        'table': table.tableName,
+        'data': jsonEncode(data),
+        'conditions': jsonEncode([{
+          "field":columName.toString(),
+          "value":recordID
+        }]),
+      });
+
 
       return phpResponse(response);
     } catch (e) {
@@ -48,16 +47,12 @@ class SqlRecord {
 
   Future<SqlBaseResponse> create(Map<String,dynamic> data) async {
     try {
-      final response = await http.post(
-        Uri.parse(table.url),
-        body: {
-          'key': table.key,
-          'action': 'create_record',
-          'table': table.tableName,
-          'data': jsonEncode(data),
-          'conditions': jsonEncode([]),
-        },
-      );
+      final response = await postData(url: table.url, key: table.key, data: {
+        'action': 'create_record',
+        'table': table.tableName,
+        'data': jsonEncode(data),
+        'conditions': jsonEncode([]),
+      });
       return phpResponse(response);
     } catch (e) {
       return SqlBaseResponse(statusCode: 0, error: e.toString());
@@ -69,15 +64,11 @@ class SqlRecord {
       throw Exception('You need to specify the row-Id and Column in row');
     }
     try {
-      final response = await http.post(
-        Uri.parse(table.url),
-        body: {
-          'key': table.key,
-          'action': 'RECORD-DELETE',
-          'table': table.tableName,
-          'conditions': jsonEncode([{"field":columName.toString(),"value":recordID}]),
-        },
-      );
+      final response = await postData(url: table.url, key: table.key, data: {
+        'action': 'RECORD-DELETE',
+        'table': table.tableName,
+        'conditions': jsonEncode([{"field":columName.toString(),"value":recordID}]),
+      });
 
       return phpResponse(response);
     } catch (e) {
@@ -96,15 +87,12 @@ class SqlRecord {
       myData.addAll({columName.toString():recordID});
     }
     try {
-      final response = await http.post(
-        Uri.parse(table.url),
-        body: {
-          'key': table.key,
-          'action': 'TABLE-ADD',
-          'table': table.tableName,
-          'data': jsonEncode(myData),
-        },
-      );
+      final response = await postData(url: table.url, key: table.key, data: {
+        'key': table.key,
+        'action': 'TABLE-ADD',
+        'table': table.tableName,
+        'data': jsonEncode(myData),
+      });
       return phpResponse(response);
     } catch (e) {
       return SqlBaseResponse(statusCode: 0, error: e.toString());

@@ -5,7 +5,6 @@ import 'package:sqlbase/src/utility/sqlbaseresponse.dart';
 
 SqlBaseResponse phpResponse(Response results) {
   if (results.statusCode != 200) {
-   // Exception("something went wrong");
     return SqlBaseResponse(statusCode: 0, error: results.body);
   }
   var data = jsonDecode(results.body);

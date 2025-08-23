@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sqlbase/sqlbase.dart';
 
 void main() {
-  Sqlbase.initialize(url: "http://localhost/sqlbase.php", key: '123456');
+  Sqlbase.initialize(url: "http://localhost/sqlbase2.php", key: '123456');
   runApp(const MyApp());
 }
 
@@ -29,7 +29,9 @@ class Home extends StatelessWidget {
       appBar: AppBar(),
       body: Center(
         child: ElevatedButton(
-            onPressed: createTable,
+            onPressed: ()async{
+             var data = await myDB.auth('user').signIn(email: "Sammedtwumasi2@gmail.com", password: "Sammedtwumasi2@gmail.com");
+            },
             child: Text('Try')),
       ),
     );
