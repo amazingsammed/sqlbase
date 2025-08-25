@@ -30,7 +30,8 @@ class Home extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
             onPressed: ()async{
-             var data = await myDB.auth('user').signIn(email: "Sammedtwumasi2@gmail.com", password: "Sammedtwumasi2@gmail.com");
+             //var data = await myDB.auth('user').signIn(email: "Sammedtwumasi2@gmail.com", password: "Sammedgh@gmail.com");
+             //print(data);
             },
             child: Text('Try')),
       ),
@@ -69,42 +70,12 @@ createTable(){
     ),
   ]);
 }
-insertRecord() async {
-  var data = await Sqlbase.insertInto('users').values({'name': "Sammed", 'from': 'Ghana'}).execute();
 
-  if (data.statusCode != 200) {
 
-  }
-}
-selectRecord() async {
-  var data = await Sqlbase.select([]).from(['users']).execute();
 
-  if (data.statusCode != 200) {
 
-  }
 
-}
 
-updateRecord() async {
-  var data = await Sqlbase.update('user').where('id', "25").execute();
-
-  if (data.statusCode != 200) {
-  }
-}
-
-deleteRecord() async {
-  var data = await Sqlbase.deleteFrom('user').where('id', "25").execute();
-
-  if (data.statusCode != 200) {
-  }
-}
-
-rawQuery() async {
-  var data = await Sqlbase.rawQuery("Select * from users").execute();
-
-  if (data.statusCode != 200) {
-  }
-}
 
 
 

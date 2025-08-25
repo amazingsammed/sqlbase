@@ -8,5 +8,5 @@ void main(List<String> args) {
   String phpCode = File(templatePath).readAsStringSync();
   final outputPath = p.join(Directory.current.path, 'sqlbase2.php');
   File(outputPath).writeAsStringSync(phpCode);
-  print("✅ PHP backend file generated at: $outputPath");
+  //print("✅ PHP backend file generated at: $outputPath");
 }

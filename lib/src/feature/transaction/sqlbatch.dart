@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import '../../../sqlbase.dart';
-import 'package:http/http.dart' as http;
 
 import '../../utility/encrypt_request.dart';
 import '../../utility/phpresponse.dart';

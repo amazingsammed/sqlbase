@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:sqlbase/src/feature/table/sqlrecord.dart';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:sqlbase/sqlbase.dart';
 import 'package:sqlbase/src/utility/encrypt_request.dart';
 
