@@ -3,6 +3,7 @@ import 'dart:convert';
 import '../../../sqlbase.dart';
 import 'package:http/http.dart' as http;
 
+import '../../utility/encrypt_request.dart';
 import '../../utility/phpresponse.dart';
 class SqlBatch {
   final List<Map> _list = [];
@@ -33,16 +34,12 @@ class SqlBatch {
   commit() async {
 
     try {
+      final response = await postData(url: url, key: key, data: {
+        'action': 'BATCH-INSERT',
+        'table': 'batch',
+        'data': jsonEncode(_list.isEmpty ? null : _list),
+      });
 
-      final response = await http.post(
-        Uri.parse(url),
-        body: {
-          'key': key,
-          'action': 'BATCH-INSERT',
-          'table': 'batch',
-          'data': jsonEncode(_list.isEmpty ? null : _list),
-        },
-      );
       _list.clear();
       return phpResponse(response);
     } catch (e) {

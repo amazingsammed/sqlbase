@@ -1,4 +1,3 @@
-
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -6,33 +5,100 @@ import '../../utility/encrypt_request.dart';
 import '../../utility/phpresponse.dart';
 import '../../utility/sqlbaseresponse.dart';
 
-class SqlAuth{
+class SqlAuth {
   final String tablename;
   final String url;
   final String key;
+
   SqlAuth(this.tablename, this.url, this.key);
-  Map<String,dynamic>? currentUser;
 
-  Future<SqlBaseResponse>signIn({required String email,required String password})async{
-    try {
-    password = password.trim();
-    email = email.trim();
-    Map<String, dynamic> userMap = {};
-    userMap.addAll({'action': 'SIGN-IN','table':tablename, 'email': email, 'password': password,'key':key});
-      final response = await postData(url: url, key: key, data: userMap);
-      return phpResponse(response);
-    } catch (e) {
-      Exception(e);
-      return SqlBaseResponse(statusCode: 0, error: "Something went wrong");
-    }
-  }
+  Map<String, dynamic>? currentUser;
 
-  Future<SqlBaseResponse>signUp({required String email,required String password, Map<String,dynamic>? data})async{
+  Future<SqlBaseResponse> signIn(
+      {required String email, required String password}) async {
     try {
       password = password.trim();
       email = email.trim();
       Map<String, dynamic> userMap = {};
-      userMap.addAll({'action': 'SIGN-UP','table':tablename, 'email': email, 'password': password,'data':jsonEncode(data) });
+      userMap.addAll({
+        'action': 'SIGN-IN',
+        'table': tablename,
+        'email': email,
+        'password': password,
+        'key': key
+      });
+      final response = await postData(url: url, key: key, data: userMap);
+      return phpResponse(response);
+    } catch (e) {
+      Exception(e);
+      return SqlBaseResponse(statusCode: 0, error: e.toString());
+    }
+  }
+
+  Future<SqlBaseResponse> changePassword(
+      {required String email,
+      required String oldpassword,
+      required String newpassword}) async {
+    try {
+      oldpassword = oldpassword.trim();
+      newpassword = newpassword.trim();
+      email = email.trim();
+      Map<String, dynamic> userMap = {};
+      userMap.addAll({
+        'action': 'CHANGEPWD',
+        'table': tablename,
+        'email': email,
+        'password': oldpassword,
+        'newpassword': newpassword,
+      });
+      final response = await postData(url: url, key: key, data: userMap);
+      return phpResponse(response);
+    } catch (e) {
+      Exception(e);
+      return SqlBaseResponse(statusCode: 0, error: e.toString());
+    }
+  }
+
+  Future<SqlBaseResponse> adminPasswordChange(
+      {
+        required String adminUserid,
+        required String emailOfUser,
+      required String newpassword}) async {
+    try {
+      newpassword = newpassword.trim();
+      emailOfUser = emailOfUser.trim();
+      newpassword = newpassword.trim();
+      Map<String, dynamic> userMap = {};
+      userMap.addAll({
+        'action': 'ADMINCHANGEPWD',
+        'table': tablename,
+        'email': emailOfUser,
+        'newpassword': newpassword,
+        'adminid': adminUserid,
+      });
+      final response = await postData(url: url, key: key, data: userMap);
+      return phpResponse(response);
+    } catch (e) {
+      Exception(e);
+      return SqlBaseResponse(statusCode: 0, error: e.toString());
+    }
+  }
+
+  Future<SqlBaseResponse> signUp(
+      {required String email,
+      required String password,
+      Map<String, dynamic>? data}) async {
+    try {
+      password = password.trim();
+      email = email.trim();
+      Map<String, dynamic> userMap = {};
+      userMap.addAll({
+        'action': 'SIGN-UP',
+        'table': tablename,
+        'email': email,
+        'password': password,
+        'data': jsonEncode(data)
+      });
       final response = await postData(url: url, key: key, data: userMap);
 
       return phpResponse(response);
@@ -42,8 +108,8 @@ class SqlAuth{
     }
   }
 
-  Future authStatus()async{
-    if(currentUser!.isNotEmpty){
+  Future authStatus() async {
+    if (currentUser!.isNotEmpty) {
       return currentUser;
     }
     return null;

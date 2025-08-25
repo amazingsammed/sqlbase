@@ -8,9 +8,9 @@ SqlBaseResponse phpResponse(Response results) {
     return SqlBaseResponse(statusCode: 0, error: results.body);
   }
   var data = jsonDecode(results.body);
- if(data is Map && data.containsKey('error')) return SqlBaseResponse(statusCode: 0,error: results.body);
+ if(data is Map && data.containsKey('error')) return SqlBaseResponse(statusCode: 0,error: data['error']);
  if(data.containsKey('success')){
  return SqlBaseResponse(statusCode: 200, data: data);
  }
-  return SqlBaseResponse(statusCode: 0, error: results.body);
+  return SqlBaseResponse(statusCode: 0, error: data['error']);
 }

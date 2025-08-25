@@ -50,6 +50,8 @@ try {
     $joins = json_decode($postData['joins'] ?? '[]', true);
     $email = $postData['email'] ?? '';
     $password = $postData['password'] ?? '';
+    $newpassword = $postData['newpassword'] ?? '';
+    $adminUserid = $postData['adminid'] ?? '';
 
     function escapeIdentifier($input): string
     {
@@ -135,6 +137,48 @@ try {
                 echo json_encode(['error' => 'Invalid email or password']);
                 break;
             }
+            echo json_encode(['success' => true, 'data' => $user]);
+            break;
+
+        case 'CHANGEPWD':
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !$password) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Invalid email or password']);
+                break;
+            }
+            $stmt = $pdo->prepare("SELECT * FROM `$table` WHERE email = ?");
+            $stmt->execute([$email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$user) {
+                http_response_code(401);
+                echo json_encode(['error' => 'User does not exist']);
+                break;
+            }
+            if (!password_verify($password, $user['password'])) {
+                http_response_code(401);
+                echo json_encode(['error' => 'Invalid email or password']);
+                break;
+            }
+            $hashedPassword = password_hash($newpassword, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("UPDATE `$table` SET password = '$hashedPassword' WHERE email = ?");
+            $stmt->execute([$email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            echo json_encode(['success' => true, 'data' => $user]);
+            break;
+
+        case 'ADMINCHANGEPWD':
+            $stmt = $pdo->prepare("SELECT * FROM `$table` WHERE email = ?");
+            $stmt->execute([$email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$user) {
+                http_response_code(401);
+                echo json_encode(['error' => 'User does not exist']);
+                break;
+            }
+            $hashedPassword = password_hash($newpassword, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("UPDATE `$table` SET password = '$hashedPassword' , editedby = '$adminUserid' WHERE email = ?");
+            $stmt->execute([$email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
             echo json_encode(['success' => true, 'data' => $user]);
             break;
 
